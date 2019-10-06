@@ -21,7 +21,7 @@ public class ConsumerService {
 	 @Autowired
 	 ProductRepository productRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(ProducerService.class);
+    private final Logger logger = LoggerFactory.getLogger(ConsumerService.class);
 
     @KafkaListener(topics = "EXAMPLE_TOPIC",group = "test-consumer-group")
     public void consume(String prodString) throws IOException {
@@ -39,14 +39,17 @@ public class ConsumerService {
     public List<Product> listAll() {
         List<Product> products = new ArrayList<>();
         productRepository.findAll().forEach(products::add); 
+        logger.info("retrieved all the products");
         return products;
     }
     
     public Product getById(UUID id) {
+    	logger.info("Call to delete a product");
         return productRepository.findOne(id);
     }
     
     public void deleteById(UUID id) {
+    	logger.info("request to delete a record");
     	productRepository.delete(id);
     }
     
