@@ -40,23 +40,31 @@ public class LowesController {
     	
     	ResponseEntity<GeneralResponse> response = null;
     	GeneralResponse result = new GeneralResponse();
-    	
-    	if(product == null || product.getCategory() == null || product.getName() == null)
-		{
-			logger.error("Incomplete data");
-			result.setResponseMessage("Request did not process");
-			result.setErrorMessage("Please provide mandatory fields category and Name");
-			response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);
-			return response;
-		}
-    	else {
-    		 String id = this.producerService.sendMessage(product).toString();
-    	        logger.info("Published record");
-    	        result.setResponseMessage("Request processed successfully");
-    	        result.setResult("REcord inserted with Id : "+id);
-    			response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+    	try {
+    		if(product == null || product.getCategory() == null || product.getName() == null)
+    		{
+    			logger.error("Incomplete data");
+    			result.setResponseMessage("Request did not process");
+    			result.setErrorMessage("Please provide mandatory fields category and Name");
+    			response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);
     			return response;
+    		}
+        	else {
+        		 String id = this.producerService.sendMessage(product).toString();
+        	        logger.info("Published record");
+        	        result.setResponseMessage("Request processed successfully");
+        	        result.setResult("REcord inserted with Id : "+id);
+        			response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        			return response;
+        	}
+    		
     	}
+    	catch(Exception e) {
+    		result.setErrorMessage("Exception Occured in /Publish");
+    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
+    		return response;
+    	}
+    	
        
     }
     
@@ -64,49 +72,64 @@ public class LowesController {
     public ResponseEntity<GeneralResponse> listProducts(){
     	ResponseEntity<GeneralResponse> response = null;
     	GeneralResponse result = new GeneralResponse();
-    	
-    	List<Product> productList = consumerService.listAll();
-    	
-    	if(productList == null) {
-    		result.setResponseMessage("No records in the database");
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+    	try {
+    		List<Product> productList = consumerService.listAll();
+        	
+        	if(productList == null) {
+        		result.setResponseMessage("No records in the database");
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        		return response;
+        	}
+        	else {
+        		result.setResponseMessage("Request processed successfully");
+            	result.setResult(productList);
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        		return response;
+        		
+        	}
+    	}
+    	catch(Exception e) {
+    		result.setErrorMessage("Exception Occured in /Publish");
+    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
-    	else {
-    		result.setResponseMessage("Request processed successfully");
-        	result.setResult(productList);
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
-    		return response;
-    		
-    	}
+    	
     }
     
     @RequestMapping({"/product/find/{id}"})
     public ResponseEntity<GeneralResponse> productById(@PathVariable String id) {
     	ResponseEntity<GeneralResponse> response = null;
     	GeneralResponse result = new GeneralResponse();
-    	if(id == null)
-		{
-			logger.error("Incomplete data");
+    	try {
+    		if(id == null)
+    		{
+    			logger.error("Incomplete data");
 
-    		result.setResponseMessage("Request did not process");
-    		result.setErrorMessage("Please enter valid Id");
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);
-    		return response;
-		}
-    	else {
-    		Product product = consumerService.getById(UUID.fromString(id));
-    		if(product == null) {
-    			result.setResponseMessage("Request processed successfully");
-    			result.setErrorMessage("No record with given Id");
-        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        		result.setResponseMessage("Request did not process");
+        		result.setErrorMessage("Please enter valid Id");
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);
         		return response;
     		}
-    		result.setResponseMessage("Request processed successfully");
-        	result.setResult(product);
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        	else {
+        		Product product = consumerService.getById(UUID.fromString(id));
+        		if(product == null) {
+        			result.setResponseMessage("Request processed successfully");
+        			result.setErrorMessage("No record with given Id");
+            		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+            		return response;
+        		}
+        		result.setResponseMessage("Request processed successfully");
+            	result.setResult(product);
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);
+        		return response;
+        	}
+    	}
+    	catch(Exception e) {
+    		result.setErrorMessage("Exception Occured in /Publish");
+    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
+    	
     }
 
     @RequestMapping("/product/delete/{id}")
@@ -114,20 +137,26 @@ public class LowesController {
     	
     	ResponseEntity<GeneralResponse> response = null;
     	GeneralResponse result = new GeneralResponse();
-    	
-    	if(id == null)
-		{
-			logger.error("Incomplete data");
+    	try {
+        	if(id == null)
+    		{
+    			logger.error("Incomplete data");
 
-    		result.setResponseMessage("Request did not process");
-    		result.setErrorMessage("Please enter valid Id");
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);;
-    		return response;
-		}
-    	else{
-    		consumerService.deleteById(UUID.fromString(id));
-    		result.setResponseMessage("Request processed successfully");
-    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);;
+        		result.setResponseMessage("Request did not process");
+        		result.setErrorMessage("Please enter valid Id");
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.BAD_REQUEST);;
+        		return response;
+    		}
+        	else{
+        		consumerService.deleteById(UUID.fromString(id));
+        		result.setResponseMessage("Request processed successfully");
+        		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.OK);;
+        		return response;
+        	}
+    	}
+    	catch(Exception e) {
+    		result.setErrorMessage("Exception Occured in /Publish");
+    		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
     }
