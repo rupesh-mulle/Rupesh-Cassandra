@@ -40,7 +40,7 @@ public class LowesController {
     }
     
     @RequestMapping({"/product/find/{id}"})
-    public Product profuctById(@PathVariable String id) {
+    public Product productById(@PathVariable String id) {
     	return consumerService.getById(UUID.fromString(id));
     }
 
