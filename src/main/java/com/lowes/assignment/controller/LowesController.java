@@ -35,6 +35,11 @@ public class LowesController {
 
     @PostMapping("/publish")
     public String sendMessageToKafkaTopic(@RequestBody Product product) {
+    	if(product == null || product.getCategory() == null || product.getName() == null)
+		{
+			logger.error("Incomplete data");
+			return "Please enter required data";
+		}
         String id = this.producerService.sendMessage(product).toString();
         logger.info("Published record");
         return "Published record for "+id;
@@ -47,11 +52,21 @@ public class LowesController {
     
     @RequestMapping({"/product/find/{id}"})
     public Product productById(@PathVariable String id) {
+    	if(id == null)
+		{
+			logger.error("Incomplete data");
+			return null;
+		}
     	return consumerService.getById(UUID.fromString(id));
     }
 
     @RequestMapping("/product/delete/{id}")
     public String deleteByID(@PathVariable String id) {
+    	if(id == null)
+		{
+			logger.error("Incomplete data");
+			return null;
+		}
     	consumerService.deleteById(UUID.fromString(id));
     	 return "Deleted Successfully";
     }
