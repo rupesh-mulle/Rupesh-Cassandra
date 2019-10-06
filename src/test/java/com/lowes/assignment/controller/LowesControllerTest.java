@@ -1,5 +1,6 @@
 package com.lowes.assignment.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -10,10 +11,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.lowes.assignment.model.GeneralResponse;
 import com.lowes.assignment.model.Product;
 
 @RunWith(SpringRunner.class)
@@ -30,6 +35,10 @@ public class LowesControllerTest {
 	 
 	 private List<Product> productList;
 	 
+	 private ResponseEntity<GeneralResponse> response;
+	 
+	 private GeneralResponse result;
+	 
 	    @Before
 	    public void setup() {
 	        product = new Product();
@@ -45,21 +54,35 @@ public class LowesControllerTest {
 	 
 	    @Test
 	    public void sendMessageToKafkaTopic() throws Exception {
-	    	when(lowesController.sendMessageToKafkaTopic(product)).thenReturn("Published record for ");
-	    	String result = lowesController.sendMessageToKafkaTopic(product);
-	    	assertEquals("Published record for ", result);
+	    	result = new GeneralResponse();
+	    	result.setResponseMessage("Published Record successfully");
+	    	when(lowesController.sendMessageToKafkaTopic(product)).thenReturn(new ResponseEntity<GeneralResponse>(result, HttpStatus.OK));
+	    	response = lowesController.sendMessageToKafkaTopic(product);
+	    	 assertEquals(HttpStatus.OK, response.getStatusCode());
+	         JSONAssert.assertEquals("Published Record successfully", response.getBody().getResponseMessage(), true);
 	    }
 	    
 	    @Test
 	    public void productById() throws Exception{
-	    	when(lowesController.productById(id)).thenReturn(product);
-	    	assertEquals("test", lowesController.productById(id).getName());
+	    	result = new GeneralResponse();
+	    	result.setResponseMessage("Request processed");
+	    	result.setResult(product);
+	    	when(lowesController.productById(id)).thenReturn(new ResponseEntity<GeneralResponse>(result, HttpStatus.OK));
+	    	response = lowesController.productById(id);
+	    	assertEquals(HttpStatus.OK, response.getStatusCode());
+	    	assertThat(response.getBody().getResult()).extracting("name").isNotEmpty();
 	    }
 	    
 	    @Test
 	    public void listProducts() throws Exception{
-	    	when(lowesController.listProducts()).thenReturn(productList);
-	    	assertEquals(true,lowesController.listProducts().size()>0);
+	    	result = new GeneralResponse();
+	    	result.setResponseMessage("Request processed");
+	    	result.setResult(product);
+	    	when(lowesController.listProducts()).thenReturn(new ResponseEntity<GeneralResponse>(result, HttpStatus.OK));
+	    	
+	    	response = lowesController.listProducts();
+	    	assertEquals(HttpStatus.OK, response.getStatusCode());
+	    	assertThat(response.getBody()).isNotNull();
 	    }
 
 }
