@@ -60,7 +60,8 @@ public class LowesController {
     		
     	}
     	catch(Exception e) {
-    		result.setErrorMessage("Exception Occured in /Publish");
+    		result.setResponseMessage("Exception Occured in /Publish");
+    		result.setErrorMessage(e.getMessage());
     		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
@@ -89,7 +90,8 @@ public class LowesController {
         	}
     	}
     	catch(Exception e) {
-    		result.setErrorMessage("Exception Occured in /Publish");
+    		result.setResponseMessage("Exception Occured in /product/showAll");
+    		result.setErrorMessage(e.getMessage());
     		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
@@ -125,7 +127,8 @@ public class LowesController {
         	}
     	}
     	catch(Exception e) {
-    		result.setErrorMessage("Exception Occured in /Publish");
+    		result.setResponseMessage("Exception Occured in /product/find/{id}");
+    		result.setErrorMessage(e.getMessage());
     		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
@@ -155,7 +158,8 @@ public class LowesController {
         	}
     	}
     	catch(Exception e) {
-    		result.setErrorMessage("Exception Occured in /Publish");
+    		result.setResponseMessage("Exception Occured in /product/delete/{id}");
+    		result.setErrorMessage(e.getMessage());
     		response = new ResponseEntity<GeneralResponse>(result, HttpStatus.INTERNAL_SERVER_ERROR);
     		return response;
     	}
